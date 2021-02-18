@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 @SpringBootTest
 class FiledataApplicationTests {
@@ -17,19 +18,26 @@ class FiledataApplicationTests {
     ImageRepository imageRepository;
 
     @Test
-    void testImageSave() throws IOException {
-        Image image = new Image();
-        image.setId(2L);
-        image.setName("SQL.JPG");
+    void testReadImage() {
+        Optional<Image> image = imageRepository.findById(2L);
 
-        String path = "C:\\Users\\Branko\\Desktop\\images for developing\\data jpg\\SQL.JPG";
-        File file = new File(path);
-        byte[] fileContent = new byte[(int) file.length()];
-        FileInputStream inputStream = new FileInputStream(file);
-        inputStream.read(fileContent);
+        String path = "C:\\Users\\Branko\\Desktop\\images for developing\\data jpg\\downloaded file\\";
+        File file = new File(path + image.get().getName());
+        FileOutputStream fos = null;
 
-        image.setData(fileContent);
-        imageRepository.save(image);
-        inputStream.close();
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(image.get().getData());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert fos != null;
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }
